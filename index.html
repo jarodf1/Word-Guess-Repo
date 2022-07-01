@@ -1,63 +1,124 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="assets/css/styles.css">
-</head>
-<body>
-    <div>
-        <h1>Word Guessing Game</h1>
-        <h4 id="directions-text">Press the button to begin</h4>
-        <b>button</b>
-        <p id="wins">Wins: </p>
-        <p id="guesses">Number of Guesses Remaining:</p>
-        <p id="letters">Letters Already Guessed:</p>
-        <P id="score"></P>
-        <p id=""></p>
-    </div>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <title>Word Guessing Game</title>
+        <link rel="stylesheet" href="assets/css/styles.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      </head>
 
-    <script>
+      <body>
+        <div class="wrapper">
+          <h1>Competitive Sports Word Guess</h1>
+          <div class="content">
+            <input type="text" class="typing-input" maxlength="1">
+            <div class="inputs"></div>
+            <div class="details">
+              <p class="guess-left">Remaining guesses: <span></span></p>
+              <p class="wrong-letter">Wrong letters: <span></span></p>
+            </div>
+            <button class="reset-btn">Reset Game</button>
+          </div>
+        </div>
 
-        var words = [
-                {q: "_ _ _ _ _", a1:"a", a2:"p", a3:"p", a4:"l", a5:"e"}, {q: "_ _ _ _ _ _", a1:"b", a2:"l", a3:"o", a4:"n", a5:"d", a6:"e"}, {q: "_ _ _ _", a1:"r", a2:"a", a3:"c", a4:"e"}
+        <script>
+            const wordList = [
+                {
+                    word: "football",
+                },
+                {
+                    word: "soccer",
+                },
+                {
+                    word:"baseball",
+                },
+                {
+                    word:"tennis",
+                },
+                {
+                    word:"volleyball",
+                },
+                {
+                    word:"running",
+                },
+                {
+                    word:"swimming",
+                },
+                {
+                    word:"bowling",
+                },
+                {
+                    word:"archery",
+                },
+                {
+                    word:"basketball",
+                },
             ]
-            var score = 0;
-            var wins = 0;
-            var guessesRemain = 10;
-            var lettersGuessed = "";
 
+            const inputs = document.querySelector(".inputs"),
+                
+                guessLeft = document.querySelector(".guess-left span"),
+                wrongLetter = document.querySelector(".wrong-letter span"),
+                resetBtn = document.querySelector(".reset-btn"),
+                typingInput = document.querySelector(".typing-input");
+
+                let word, maxGuesses, incorrectLetters = [], correctLetters = [];
+
+            function randomWord() {
+                let ranItem = wordList[Math.floor(Math.random() * wordList.length)];
+                word = ranItem.word;
+                maxGuesses = word.length >= 5 ? 8 : 6;
+                correctLetters = []; incorrectLetters = [];
             
+                guessLeft.innerText = maxGuesses;
+                wrongLetter.innerText = incorrectLetters;
 
-            function renderWords() {
-            if (lettersGuessed === words.a1){
-                document.querySelector("#guesses").innerHTML = words[guessesIndex].q1
-            }
-            else {
-                document.querySelector("question").innerHTML = "Game Over!";
-                document.querySelector("score").innerHTML = "Final Score: " + score + " out of " + questions.length;
-            }
-            }
-
-            function updateScore() {
-                document.querySelector("#score").innerHTML = "Score: " + score;
+                let html = "";
+                for (let i = 0; i < word.length; i++) {
+                    html += `<input type="text" disabled>`;
+                    inputs.innerHTML = html;
+                }
             }
 
-            renderWords();
-            updateScore();
+            randomWord();
 
-            document.onkeyup = function(event) {
-            var userGuess = event.key;
+            function initGame(e) {
+                let key = e.target.value.toLowerCase();
+                if(key.match(/^[A-Za-z]+$/) && !incorrectLetters.includes(` ${key}`) && !correctLetters.includes(key)) {
+                    if(word.includes(key)) {
+                        for (let i = 0; i < word.length; i++) {
+                            if(word[i] == key) {
+                                correctLetters += key;
+                                inputs.querySelectorAll("input")[i].value = key;
+                            }
+                        }
+                        } else {
+                            maxGuesses--;
+                            incorrectLetters.push(` ${key}`);
+                        }
+                        guessLeft.innerText = maxGuesses;
+                        wrongLetter.innerText = incorrectLetters;
+            }
 
+         typingInput.value = "";
 
-            
+            setTimeout(() => {
+                if(correctLetters.length === word.length) {
+                    alert(`Congrats! You found the word ${word.toUpperCase()}`);
+                    return randomWord();
+                } else if(maxGuesses < 1) {
+                    alert("Game over! You don't have remaining guesses");
+                    for(let i = 0; i < word.length; i++) {
+                        inputs.querySelectorAll("input")[i].value = word[i];
+                    }
+                }
+            }, 100);
         }
 
-
-
-
-    </script>
-</body>
-</html>
+            resetBtn.addEventListener("click", randomWord);
+            typingInput.addEventListener("input", initGame);
+            inputs.addEventListener("click", () => typingInput.focus());
+            document.addEventListener("keydown", () => typingInput.focus());
+        </script>
+      </body>
+    </html>
